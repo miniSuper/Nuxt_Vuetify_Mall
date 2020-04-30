@@ -1,0 +1,10 @@
+{
+  "eslintIntegration": true,
+  "singleQuote": true,
+  "semi": false,
+  "space-before-blocks": true,
+  "useTabs": false,
+  "indent_style": "space",
+  "indent_size": 10,
+  "eslint.autoFixOnSave": true
+}
