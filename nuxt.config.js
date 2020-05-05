@@ -18,15 +18,21 @@ module.exports = {
    ** Headers of the page
    */
   head: {
-    titleTemplate: '%s - ' + process.env.npm_package_name,
-    title: '最有料-人脉库',
+    titleTemplate: '%s',
+    title: '最有料-人脉库 化工高分子原材料交易平台',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
         hid: 'description',
         name: 'description',
-        content: process.env.npm_package_description || ''
+        content:
+          '最有料科技有限公司专注于工程塑料、高性能塑料呆滞原料交易。依托互联网平台，高效匹配供需双方，为买家提供低价、正品原料；为卖家高效、快捷处理呆滞库存，交易呆滞原料全部【原厂原包】'
+      },
+      {
+        hid: 'keywords',
+        name: 'keywords',
+        content: '高分子材料、塑料、化工高分子、互联网交易平台'
       }
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
