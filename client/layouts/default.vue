@@ -1,117 +1,166 @@
 <template>
-  <v-app dark>
+  <v-app
+    class="default-layout"
+    them--light
+  >
+    <!--  侧边栏 -->
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant="miniVariant"
-      :clipped="clipped"
-      fixed
       app
+      right
     >
-      <v-list>
+      <v-list dense>
         <v-list-item
-          v-for="(item, i) in items"
-          :key="i"
-          :to="item.to"
-          router
-          exact
+          v-for="(item,index) in navList"
+          :key="index"
+          link
+          @click="toggleRoute(item.path)"
         >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
+            <v-list-item-title>
+              {{ item.name }}
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar
-      :clipped-left="clipped"
-      fixed
-      app
-    >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-btn
-        icon
-        @click.stop="miniVariant = !miniVariant"
-      >
-        <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="clipped = !clipped"
-      >
-        <v-icon>mdi-application</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="fixed = !fixed"
-      >
-        <v-icon>mdi-minus</v-icon>
-      </v-btn>
-      <v-toolbar-title v-text="title" />
+    <!--  侧边栏 end -->
+
+    <v-app-bar app>
+      <div class="bar-logo">
+        <img
+          class="bar-logo-img"
+          src="/images/logo.png"
+          alt=""
+        >
+      </div>
       <v-spacer />
-      <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
+      <!-- 顶部导航栏 -->
+      <div class="right-menus">
+        <ul class="bar-menus">
+          <li
+            v-for="(nav,index) in navList"
+            :key="index"
+            class="nav-item"
+          >
+            <v-btn
+              text
+              large
+              color="#333"
+              @click="toggleRoute(nav.path)"
+            > {{ nav.name }}</v-btn>
+          </li>
+        </ul>
+        <div class="btn-group clearfix">
+          <v-btn
+            class="fl"
+            color="primary"
+            large
+            @click="toLogin"
+          >登录</v-btn>
+          <v-btn
+            text
+            large
+            color="primary"
+            @click="toRegister"
+          >注册</v-btn>
+        </div>
+        <!-- 汉堡按钮 -->
+        <v-app-bar-nav-icon
+          class="bar-nav-icon"
+          @click.stop="drawer = !drawer"
+        />
+      </div>
+      <!-- 顶部导航栏 end-->
+
     </v-app-bar>
+
+    <!--  router-view -->
     <v-content>
-      <v-container>
+      <v-container
+        class="fill-height"
+        fluid
+      >
         <nuxt />
       </v-container>
     </v-content>
-    <v-navigation-drawer
-      v-model="rightDrawer"
-      :right="right"
-      temporary
-      fixed
-    >
-      <v-list>
-        <v-list-item @click.native="right = !right">
-          <v-list-item-action>
-            <v-icon light>
-              mdi-repeat
-            </v-icon>
-          </v-list-item-action>
-          <v-list-item-title>Switch drawer (click me)</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer>
+    <!--  router-view  end-->
+
+    <!-- 页脚 -->
     <v-footer
-      :fixed="fixed"
+      class="layout-footer"
       app
+      absolute
+      inset
     >
-      <span>&copy; {{ new Date().getFullYear() }}</span>
+      <p class="footer-item">地址：厦门市海沧区海沧大道567号厦门中心E座701单元</p>
+      <p class="footer-item">客服电话:0592-6809221</p>
+      <p class="footer-item"> 闽ICP备16032434号-1</p>
     </v-footer>
+    <!-- 页脚 end-->
+
   </v-app>
 </template>
 
 <script>
 export default {
-  data () {
-    return {
-      clipped: false,
-      drawer: false,
-      fixed: false,
-      items: [
-        {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
-        }
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'Vuetify.js'
+  props: {
+    source: {
+      type: String,
+      default: ''
+    }
+  },
+  data: () => ({
+    drawer: false,
+    navList: [{
+      path: '/',
+      name: '首页'
+    }, {
+      path: '/doc',
+      name: '论坛'
+    }, {
+      path: '/user',
+      name: '个人中心'
+    }, {
+      path: '/about-us',
+      name: '关于我们'
+    }],
+    items: [
+      { title: 'Click Me' },
+      { title: 'Click Me' },
+      { title: 'Click Me' },
+      { title: 'Click Me 2' }
+    ]
+  }),
+  methods: {
+    toggleRoute(path) {
+      this.$router.push(path)
+    },
+    toLogin() {
+      this.$router.push('/login')
+    },
+    toRegister() {
+      this.$router.push('/register')
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+.v-footer {
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  .footer-item {
+    margin-right: 40px;
+    margin-bottom: 0;
+  }
+}
+.bar-logo-img {
+  height: 32px;
+}
+.btn-group {
+  .v-btn {
+    margin-right: 20px;
+  }
+}
+</style>

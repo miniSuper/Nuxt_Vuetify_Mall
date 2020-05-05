@@ -21,11 +21,12 @@
     ]
   },
   "dependencies": {
-    "nuxt": "^2.0.0",
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/dotenv": "^1.4.0",
+    "axios": "^0.19.2",
     "cross-env": "^5.2.0",
     "koa": "^2.6.2",
-    "@nuxtjs/axios": "^5.3.6",
-    "@nuxtjs/dotenv": "^1.4.0"
+    "nuxt": "^2.0.0"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.0.0",
@@ -42,6 +43,8 @@
     "eslint-plugin-vue": "^6.2.2",
     "nodemon": "^1.18.9",
     "prettier": "^2.0.5",
-    "prettier-eslint": "^9.0.1"
+    "prettier-eslint": "^9.0.1",
+    "sass-loader": "^8.0.2",
+    "scss-loader": "0.0.1"
   }
 }
