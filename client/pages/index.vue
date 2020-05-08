@@ -17,10 +17,7 @@
         </div>
       </v-carousel-item>
     </v-carousel>
-    <h1
-      v-for="(item,index) in 200"
-      :key="index"
-    >这是是首页</h1>
+    <h1>首页</h1>
   </div>
 </template>
 <script>

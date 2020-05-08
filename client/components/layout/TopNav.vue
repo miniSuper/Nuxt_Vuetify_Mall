@@ -1,92 +1,65 @@
 <template>
-  <v-app-bar>
-    <div class="bar-logo">
+  <div class="top-nav">
+    <div class="pc-center clearfix">
       <img
-        class="bar-logo-img"
-        src="/images/logo.png"
+        class="nav-logo"
+        src="/images/logo_nav.png"
         alt=""
       >
-    </div>
-    <v-spacer />
-    <!-- 顶部导航栏 -->
-    <div class="right-menus">
-      <ul class="bar-menus">
-        <li
-          v-for="(nav,index) in navList"
+      <div class="nav-right-wrap fr">
+        <a
+          v-for="(item,index) in navList"
           :key="index"
-          class="nav-item"
-        >
-          <v-btn
-            text
-            large
-            color="#333"
-            @click="toggleRoute(nav.path)"
-          > {{ nav.name }}</v-btn>
-        </li>
-      </ul>
-      <div class="btn-group clearfix">
-        <v-btn
-          class="fl"
-          color="primary"
-          large
-          @click="toLogin"
-        >登录</v-btn>
-        <v-btn
-          text
-          large
-          color="primary"
-          @click="toRegister"
-        >注册</v-btn>
+          :href="item.url"
+          :class="{'active':index === currentIndex}"
+          class="nav-right-item"
+        >{{ item.name }}</a>
       </div>
-      <!-- 汉堡按钮 -->
-      <v-app-bar-nav-icon
-        class="bar-nav-icon"
-        @click.stop="drawer = !drawer"
-      />
     </div>
-    <!-- 顶部导航栏 end-->
-
-  </v-app-bar>
+  </div>
 </template>
 
 <script>
-
+import { navList } from '@/config/data'
 export default {
+  name: 'TopNav',
   data() {
     return {
-      navList: [{
-        path: '/',
-        name: '首页'
-      }, {
-        path: '/mall',
-        name: '自营商城'
-      }, {
-        path: '/market',
-        name: '开放平台'
-      }, {
-        path: '/about-us',
-        name: '关于我们'
-      }, {
-        path: '/user',
-        name: '个人中心'
-      }]
+      navList,
+      currentIndex: 0
     }
   },
   computed: {},
-  created() {},
-  mounted() {},
-  methods: {
-    toggleRoute(path) {
-      this.$router.push(path)
-    },
-    toLogin() {
-      this.$router.push('/login')
-    },
-    toRegister() {
-      this.$router.push('/register')
-    }
-  }
+  created() {
+    const currentIndex = this.navList.findIndex(item => item.path === this.$route.path)
+    this.currentIndex = currentIndex === -1 ? 0 : currentIndex
+  },
+  methods: {}
 }
 </script>
 <style lang='scss' scoped>
+.top-nav {
+  height: 48px;
+  padding: 18px 0;
+  background: #fff;
+  border-bottom: 1px solid #efefef;
+  box-sizing: content-box;
+  .nav-right-wrap {
+    .nav-right-item {
+      display: inline-block;
+      border-bottom: 2px solid transparent;
+      color: #333;
+      font-size: 16px;
+      line-height: 48px;
+      margin-left: 24px;
+      &.active {
+        border-bottom: 2px solid #1588fc;
+        color: #1588fc;
+      }
+      &:hover {
+        color: #1588fc;
+      }
+    }
+  }
+}
 </style>

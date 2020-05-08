@@ -1,15 +1,14 @@
 import axios from 'axios'
 import Qs from 'qs'
 import { Message } from 'element-ui'
-const dotenv = require('dotenv')
-const fs = require('fs')
-const path = require('path')
-const ENV_CONFIG = dotenv.parse(
-  fs.readFileSync(path.join(__dirname, '..', '.env.' + process.env.mode))
-)
+// console.log('path-name', `../env/env.${process.env.mode}.js`)
+// const ENV_CONFIG = require(`../env/env.${process.env.mode}.js`)
+// console.log('{process.env.mode', process.env.mode)
+// console.log('{ENV_CONFIG', ENV_CONFIG)
+console.log('process.env.API_URL', process.env.API_URL)
 // 创建axios实例
 const service = axios.create({
-  baseURL: ENV_CONFIG.API_URL, // api 的 base_url
+  baseURL: process.env.API_URL, // api 的 base_url
   timeout: 30000, // request timeout
   transformRequest: [
     function (data) {

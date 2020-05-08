@@ -23,75 +23,22 @@
             </span>
           </a>
         </li>
-        <!-- <li class="header-right-item">
-          <img
-            class="icon"
-            src="/images/login.png"
-          />
-          <span>
-            登录
-          </span>
-        </li>
-        <li class="header-right-item">
-          <img
-            class="icon"
-            src="/images/register.png"
-          />
-          <span>
-            注册
-          </span>
-        </li>
-        <li class="header-right-item">
-          <img
-            class="icon"
-            src="/images/shopCarts.png"
-          />
-          <span>
-            购物车
-          </span>
-        </li>
-        <li class="header-right-item">
-          <img
-            class="icon"
-            src="/images/info.png"
-          />
-          <span>
-            消息
-          </span>
-        </li> -->
       </ul>
     </div>
   </div>
 </template>
 
 <script>
-import CONFIG from '@/config'
+import { headerList } from '@/config/data'
 export default {
   components: {},
   data() {
     return {
-      headerList: [{
-        name: '登录',
-        iconPath: '/images/login.png',
-        url: CONFIG.domain + '/Login'
-      }, {
-        name: '注册',
-        iconPath: '/images/register.png',
-        url: CONFIG.domain + '/Reg'
-      }, {
-        name: '购物车',
-        iconPath: '/images/shopCarts.png',
-        url: CONFIG.domain + '/Login'
-      }, {
-        name: '消息',
-        iconPath: '/images/info.png',
-        url: CONFIG.domain + '/Login'
-      }]
+      headerList
     }
   },
   computed: {},
   mounted() {
-    console.log(CONFIG.domain)
   },
   methods: {}
 }

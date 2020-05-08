@@ -2,19 +2,9 @@
   <v-app class="default-layout">
     <Header />
     <TopNav />
-    <!-- <SideBar /> -->
-
-    <!--  router-view -->
     <v-content>
-      <v-container
-        class="fill-height"
-        fluid
-      >
-        <nuxt />
-      </v-container>
+      <nuxt />
     </v-content>
-    <!--  router-view  end-->
-
     <Footer />
   </v-app>
 </template>

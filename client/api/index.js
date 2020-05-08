@@ -8,3 +8,12 @@ export const apiCompanyInfo = (params) => {
     params
   })
 }
+
+// 获取新闻资讯列表
+export const apiMarketNewsList = (params) => {
+  return request({
+    url: '/article/getInfoByType',
+    method: 'get',
+    params
+  })
+}

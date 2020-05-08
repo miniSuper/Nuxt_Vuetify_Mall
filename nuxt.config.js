@@ -5,12 +5,11 @@ const path = require('path')
 const ENV_CONFIG = dotenv.parse(
   fs.readFileSync(path.join(__dirname, 'client', '.env.' + process.env.mode))
 )
-console.log('ENV_CONFIG', ENV_CONFIG)
 module.exports = {
   mode: 'universal',
   srcDir: 'client/',
   env: {
-    NODE_ENV: ENV_CONFIG.NODE_ENV
+    NODE_ENV: process.env.mode
   },
   HOST: ENV_CONFIG.HOST,
   PORT: ENV_CONFIG.PORT,
@@ -23,6 +22,18 @@ module.exports = {
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      {
+        name: 'renderer',
+        content: 'webkit' // 默认使用极速模式，作用于360浏览器、QQ浏览器等国产双核浏览器
+      },
+      {
+        name: 'force-rendering',
+        content: 'webkit' // 默认使用极速模式，作用于其他双核浏览器
+      },
+      {
+        name: 'X-UA-Compatible',
+        content: 'IE=edge,chrome=1' // 如果有安装 Google Chrome Frame 插件则默认使用Chromium内核（也就是极速模式内核），否则强制本机支持的最高版本IE内核，作用于IE浏览器
+      },
       {
         hid: 'description',
         name: 'description',
@@ -45,15 +56,13 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: ['~/assets/styles/global.scss'],
+  css: ['element-ui/lib/theme-chalk/index.css', '~/assets/styles/global.scss'],
   /*
    ** Plugins to load before mounting the App
    */
   plugins: [
-    {
-      src: '~plugins/element-ui.js',
-      ssr: true
-    }
+    { src: '~/plugins/element-ui.js', ssr: true },
+    { src: '~/plugins/vue-extend.js' }
   ],
   /*
    ** Nuxt.js dev-modules
@@ -66,7 +75,7 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     // Doc: https://github.com/nuxt-community/dotenv-module
-    '@nuxtjs/dotenv'
+    ['@nuxtjs/dotenv', { filename: '.env.' + process.env.mode }]
   ],
   /*
    ** Axios module configuration
