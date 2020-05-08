@@ -14,7 +14,12 @@
     <div class="search grey-glass">
       <div class="search-slogan">用心服务 成就美好</div>
       <div class="search-bar-wrap">
-        <el-input v-model="searchWord" />
+        <el-input
+          v-model="searchWord"
+          placeholder="请输入搜索的问题或关键字"
+          @click="handleSearch"
+          @keyup.enter.native="handleSearch"
+        />
         <el-button type="primary">搜索</el-button>
       </div>
     </div>
@@ -38,12 +43,12 @@
           class="news-list"
         >
           <el-table-column
-            prop="title"
+            prop="fTitle"
             label="标题"
           >
           </el-table-column>
           <el-table-column
-            prop="updateTime"
+            prop="fUpdateTime"
             width="200"
             label="更新时间"
             sortable
@@ -55,8 +60,8 @@
         <Pagination
           v-show="total>0"
           :total="total"
-          :page.sync="listQuery.current"
-          :limit.sync="listQuery.size"
+          :page.sync="listQuery.page"
+          :limit.sync="listQuery.num"
           class="pagination"
           @pagination="getMainList"
         />
@@ -88,38 +93,35 @@ export default {
           name: '行业热点'
         }
       ],
-      newsList: [{
-        title: '标题1111',
-        updateTime: '2020-5-8'
-      }, {
-        title: '标题1111',
-        updateTime: '2020-5-8'
-      }, {
-        title: '标题1111',
-        updateTime: '2020-5-8'
-      }, {
-        title: '标题1111',
-        updateTime: '2020-5-8'
-      }],
+      newsList: [],
       currentTabIndex: 0,
       total: 0,
-      listQuery: {}
+      listQuery: {
+        page: 1,
+        num: 10,
+        fCategoryId: ''
+      }
     }
   },
-  asyncData() {
-
+  created() {
+    this.getMainList()
   },
   methods: {
     async getMainList() {
-      // const { data } = await apiMarketNewsList()
-      // console.log(data)
+      try {
+        this.listQuery.fCategoryId = '9308860b471946b89a8823decd76d4a8'
+        const { data } = await apiMarketNewsList(this.listQuery)
+        this.newsList = data.other.informationList
+      } catch (error) {
+        console.error(error)
+        // this.$commonFunc.alertError(error)
+      }
     },
     toggleTab(index) {
-      console.log(index)
-      apiMarketNewsList()
+      this.getMainList()
     },
     handleSearch() {
-
+      console.log(this.searchWord)
     }
   }
 }
