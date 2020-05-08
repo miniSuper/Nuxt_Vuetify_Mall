@@ -19,7 +19,7 @@ module.exports = {
    */
   head: {
     titleTemplate: '%s',
-    title: '最有料-人脉库 化工高分子原材料交易平台',
+    title: '最有料 - 买改性塑料,就上最有料',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -27,12 +27,13 @@ module.exports = {
         hid: 'description',
         name: 'description',
         content:
-          '最有料科技有限公司专注于工程塑料、高性能塑料呆滞原料交易。依托互联网平台，高效匹配供需双方，为买家提供低价、正品原料；为卖家高效、快捷处理呆滞库存，交易呆滞原料全部【原厂原包】'
+          '最有料塑料交易平台，专注于塑化行业交易的服务平台。以供应链、资金支持交易服务，以SaaS工具赋能企业工业升级服务的工业互联网平台。'
       },
       {
         hid: 'keywords',
         name: 'keywords',
-        content: '高分子材料、塑料、化工高分子、互联网交易平台'
+        content:
+          '塑料，新材料、塑料行情，塑料原材料，原材料交易，改性料，改性塑料，最有料'
       }
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
@@ -48,7 +49,12 @@ module.exports = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
+  plugins: [
+    {
+      src: '~plugins/element-ui.js',
+      ssr: true
+    }
+  ],
   /*
    ** Nuxt.js dev-modules
    */

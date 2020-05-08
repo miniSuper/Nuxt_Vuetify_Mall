@@ -1,1 +1,7 @@
 // 默认的vuetify的样式覆盖
+
+.v-application {
+  a {
+    text-decoration: none;
+  }
+}
