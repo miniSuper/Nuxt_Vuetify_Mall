@@ -46,12 +46,12 @@
 </template>
 
 <script>
-
+import { quickLinks } from '@/config/data'
 export default {
   components: {},
   data() {
     return {
-      quickLinks: [{ name: '关于我们', path: 'http://vip.zuiyouliao.com/AboutUs' }, { name: '法律声明', path: 'http://vip.zuiyouliao.com/LegalNotice' }, { name: '隐私保护', path: 'http://vip.zuiyouliao.com/PrivacyStatement' }, { name: '帮助中心', path: 'http://vip.zuiyouliao.com/HelpCenter' }]
+      quickLinks
     }
   },
   computed: {},

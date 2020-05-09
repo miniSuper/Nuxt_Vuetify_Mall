@@ -28,12 +28,13 @@
         <v-list>
           <v-list-item-group v-model="currentTabIndex">
             <v-list-item
-              v-for="(item, index) in tabList"
+              v-for="(item,index) in tabList"
               :key="index"
-              @click="toggleTab(index)"
+              :data-index="index"
+              @click="toggleTab(item,index)"
             >
               <v-list-item-content>
-                <v-list-item-title v-text="item.name"></v-list-item-title>
+                <v-list-item-title v-text="item.fTitle"></v-list-item-title>
               </v-list-item-content>
             </v-list-item>
           </v-list-item-group>
@@ -60,10 +61,10 @@
         <Pagination
           v-show="total>0"
           :total="total"
-          :page.sync="listQuery.page"
-          :limit.sync="listQuery.num"
+          :page.sync="listQuery.num"
+          :limit.sync="listQuery.page"
           class="pagination"
-          @pagination="getMainList"
+          @pagination="togglePagination"
         />
       </div>
     </div>
@@ -73,52 +74,113 @@
 <script>
 import { headerList, navList } from '@/config/data'
 import Pagination from '@/components/Pagination'
-import { apiMarketNewsList } from '@/api'
+import { apiMarketNewsList, apiMarketNewsTypeList } from '@/api'
 export default {
   name: 'MarketMessage',
   components: { Pagination },
+  async asyncData({ req, query }) {
+    if (req) {
+      const resType = await apiMarketNewsTypeList({ num: 0, page: 10 })
+      const tabList = resType.data && resType.data.other && resType.data.other.infCategoryList
+      const id = Array.isArray(tabList) && tabList[0] && tabList[0].fCategoryId
+      const { fCategoryId = id, num = 1, page = 10 } = query
+      const resNews = await apiMarketNewsList({ fCategoryId, num, page })
+      const newsList = resNews.data && resNews.data.other && resNews.data.other.informationList
+      let total = resNews.data && resNews.data.other && resNews.data.other.pages
+      if (typeof total === 'number') {
+        total = total * 10
+      }
+      return {
+        tabList, newsList, total, fCategoryId, num, page
+      }
+    }
+  },
   data() {
     return {
       headerList,
       navList,
       searchWord: '',
-      tabList: [
-        {
-          name: '有料资讯'
-        },
-        {
-          name: '行业分析'
-        },
-        {
-          name: '行业热点'
-        }
-      ],
+      tabList: [],
       newsList: [],
       currentTabIndex: 0,
       total: 0,
+      prevTabIndex: 0,
       listQuery: {
-        page: 1,
-        num: 10,
+        page: 10, // 你就理解成pageSize
+        num: 1, // 你就理解成currentNum
         fCategoryId: ''
-      }
+      },
+      paginCache: []
     }
   },
   created() {
-    this.getMainList()
+    this.listQuery.fCategoryId = this.fCategoryId
+    this.listQuery.num = this.num
+    this.listQuery.page = this.page
+  },
+  mounted() {
+    this.getPageCache()
   },
   methods: {
-    async getMainList() {
+    async getTableList() {
       try {
-        this.listQuery.fCategoryId = '9308860b471946b89a8823decd76d4a8'
         const { data } = await apiMarketNewsList(this.listQuery)
-        this.newsList = data.other.informationList
+        this.newsList = data.other && data.other.informationList
+        this.total = data.other && data.other.pages && data.other.pages * this.listQuery.page
+        return data.other && data.other.informationList
+      } catch (error) {
+        console.error(error)
+        return Promise.reject(error)
+        // this.$commonFunc.alertError(error)
+      }
+    },
+    async getTabList() {
+      try {
+        const { data } = await apiMarketNewsTypeList({ num: 0, page: 10 })
+        console.log(data)
+        this.tabList = data.other.infCategoryList
       } catch (error) {
         console.error(error)
         // this.$commonFunc.alertError(error)
       }
     },
-    toggleTab(index) {
-      this.getMainList()
+    getPageCache() {
+      this.tabList.forEach(element => {
+        this.paginCache.push({ page: 10, num: 1 })
+      })
+    },
+    setPageCache(index) {
+      const { page, num } = this.listQuery
+      this.paginCache[index].page = page
+      this.paginCache[index].num = num
+    },
+    getListQueryFromPageCache(index) {
+      const { page, num } = this.paginCache[index]
+      this.total = page * num
+      this.$set(this.listQuery, 'page', page)
+      this.$set(this.listQuery, 'num', num)
+    },
+    async toggleTab(item, currentTabIndex) {
+      // 保存当前tab对应的page和num
+      this.setPageCache(this.prevTabIndex)
+      // 设置当前listQuery的id参数
+      this.listQuery.fCategoryId = item.fCategoryId
+      // 取出将要去的tab对应的 page num
+      this.getListQueryFromPageCache(currentTabIndex)
+      // 发起请求
+      await this.getTableList()
+      // 请求结束后  将prevTabIndex 设置为当前的tabIndex
+      this.prevTabIndex = currentTabIndex
+    },
+    togglePagination(e) {
+      this.getTableList()
+      this.$router.push({
+        path: '/MarketMessage',
+        query: {
+          num: e.page,
+          page: e.limit
+        }
+      })
     },
     handleSearch() {
       console.log(this.searchWord)

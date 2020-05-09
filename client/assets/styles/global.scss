@@ -52,3 +52,14 @@
     z-index: 0;
   }
 }
+
+.link-type,
+.link-type:focus {
+  color: rgb(32, 160, 255);
+  cursor: pointer;
+
+  &:hover {
+    color: rgb(32, 160, 255);
+    text-decoration: underline;
+  }
+}

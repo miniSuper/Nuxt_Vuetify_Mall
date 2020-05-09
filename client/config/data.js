@@ -49,3 +49,9 @@ export const navList = [
     url: domain + '/PersonalCenter'
   }
 ]
+export const quickLinks = [
+  { name: '关于我们', path: domain + '/AboutUs' },
+  { name: '法律声明', path: domain + '/LegalNotice' },
+  { name: '隐私保护', path: domain + '/PrivacyStatement' },
+  { name: '帮助中心', path: domain + '/HelpCenter' }
+]
