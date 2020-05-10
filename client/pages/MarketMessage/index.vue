@@ -1,16 +1,6 @@
 <template>
   <div class="page-wrap">
-    <div class="location-bar">
-      <div class="pc-center">
-        <span class="location-title">当前位置：</span>
-        <span
-          class="location-home un-select"
-          @click="$commonFunc.toHomePage(false)"
-        >首页</span>
-        <span class="location-arrow"> > </span>
-        <span class="location-current un-select">行情资讯</span>
-      </div>
-    </div>
+    <LocationBar :location-list="locationList" />
     <div class="search grey-glass">
       <div class="search-slogan">用心服务 成就美好</div>
       <div class="search-bar-wrap">
@@ -47,6 +37,14 @@
             prop="fTitle"
             label="标题"
           >
+            <template slot-scope="scope">
+              <span
+                class="link-type"
+                @click="toArticleDetail(scope.row)"
+              >
+                {{ scope.row.fTitle }}
+              </span>
+            </template>
           </el-table-column>
           <el-table-column
             prop="fUpdateTime"
@@ -74,10 +72,11 @@
 <script>
 import { headerList, navList } from '@/config/data'
 import Pagination from '@/components/Pagination'
+import LocationBar from '@/components/LocationBar'
 import { apiMarketNewsList, apiMarketNewsTypeList } from '@/api'
 export default {
   name: 'MarketMessage',
-  components: { Pagination },
+  components: { Pagination, LocationBar },
   async asyncData({ req, query }) {
     if (req) {
       const resType = await apiMarketNewsTypeList({ num: 0, page: 10 })
@@ -105,6 +104,7 @@ export default {
       currentTabIndex: 0,
       total: 0,
       prevTabIndex: 0,
+      locationList: [{ name: '行情资讯', path: '' }],
       listQuery: {
         page: 10, // 你就理解成pageSize
         num: 1, // 你就理解成currentNum
@@ -115,8 +115,8 @@ export default {
   },
   created() {
     this.listQuery.fCategoryId = this.fCategoryId
-    this.listQuery.num = this.num
-    this.listQuery.page = this.page
+    this.listQuery.num = this.num ? Number(this.num) : 1
+    this.listQuery.page = this.page ? Number(this.page) : 1
   },
   mounted() {
     this.getPageCache()
@@ -149,16 +149,16 @@ export default {
         this.paginCache.push({ page: 10, num: 1 })
       })
     },
-    setPageCache(index) {
-      const { page, num } = this.listQuery
-      this.paginCache[index].page = page
-      this.paginCache[index].num = num
-    },
     getListQueryFromPageCache(index) {
       const { page, num } = this.paginCache[index]
       this.total = page * num
       this.$set(this.listQuery, 'page', page)
       this.$set(this.listQuery, 'num', num)
+    },
+    setPageCache(index) {
+      const { page, num } = this.listQuery
+      this.paginCache[index].page = page
+      this.paginCache[index].num = num
     },
     async toggleTab(item, currentTabIndex) {
       // 保存当前tab对应的page和num
@@ -171,6 +171,9 @@ export default {
       await this.getTableList()
       // 请求结束后  将prevTabIndex 设置为当前的tabIndex
       this.prevTabIndex = currentTabIndex
+    },
+    toArticleDetail(item) {
+      console.log(item)
     },
     togglePagination(e) {
       this.getTableList()
@@ -190,22 +193,6 @@ export default {
 </script>
 <style lang='scss' scoped>
 .page-wrap {
-  .location-bar {
-    padding: 12px 0;
-    .location-title {
-      font-size: 14px;
-      color: #333;
-    }
-    .location-home,
-    .location-current {
-      font-size: 14px;
-      color: #666;
-      cursor: pointer;
-      &:hover {
-        color: #1588fc;
-      }
-    }
-  }
   .search {
     position: relative;
     background: url('/images/banner_cooperate.jpg') no-repeat center center;

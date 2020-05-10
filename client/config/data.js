@@ -50,8 +50,20 @@ export const navList = [
   }
 ]
 export const quickLinks = [
-  { name: '关于我们', path: domain + '/AboutUs' },
-  { name: '法律声明', path: domain + '/LegalNotice' },
-  { name: '隐私保护', path: domain + '/PrivacyStatement' },
-  { name: '帮助中心', path: domain + '/HelpCenter' }
+  { name: '关于我们', url: domain + '/AboutUs', path: '/footer/AboutUs' },
+  {
+    name: '法律声明',
+    url: domain + '/LegalNotice',
+    path: '/footer/LegalNotice'
+  },
+  {
+    name: '隐私保护',
+    url: domain + '/PrivacyProtection',
+    path: '/footer/PrivacyProtection'
+  },
+  {
+    name: '帮助中心',
+    url: domain + '/HelpCenter',
+    path: '/footer/HelpCenter'
+  }
 ]

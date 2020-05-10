@@ -29,12 +29,12 @@
       </div>
       <div class="footer-bottom">
         <div class="quick-link-wrap">
-          <a
+          <nuxt-link
             v-for="(item,index) in quickLinks"
             :key="index"
-            :href="item.path"
+            :to="item.path"
             class="quick-link-item"
-          >{{ item.name }}</a>
+          >{{ item.name }}</nuxt-link>
         </div>
         <p class="copyright">
           Copyright © 最有料 www.zuiyouliao.com 闽ICP备17020731号
