@@ -1,4 +1,4 @@
-import { generateImgUrl } from '@/utils'
+import { generateImgUrl, generateNoNullableObject } from '@/utils'
 export default {
   data() {
     return {
@@ -6,6 +6,7 @@ export default {
     }
   },
   methods: {
-    generateImgUrl
+    generateImgUrl,
+    generateNoNullableObject
   }
 }

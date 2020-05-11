@@ -11,7 +11,10 @@
               :class="{'expanded':expandRows['industry']}"
             >
               <span class="filter-label fl">行业方案</span>
-              <div class="filter-value-wrap fl">
+              <div
+                ref="wrapIndustry"
+                class="filter-value-wrap fl"
+              >
                 <span
                   v-for="(item,index) in industryList"
                   :key="index"
@@ -22,7 +25,7 @@
               </div>
             </div>
             <span
-              v-show="!expandRows['industry']"
+              v-show="isExpandIndustryTagShow && !expandRows['industry']"
               class="row-expand un-select"
               @click="expandFieldRow('industry')"
             >
@@ -30,7 +33,7 @@
               <i class="el-icon-arrow-down"></i>
             </span>
             <span
-              v-show="expandRows['industry']"
+              v-show="isExpandIndustryTagShow &&expandRows['industry']"
               class="row-expand un-select"
               @click="expandFieldRow('industry')"
             >
@@ -44,7 +47,10 @@
               :class="{'expanded':expandRows['product']}"
             >
               <span class="filter-label fl">品名</span>
-              <div class="filter-value-wrap fl">
+              <div
+                ref="wrapProduct"
+                class="filter-value-wrap fl"
+              >
                 <span
                   v-for="(item,index) in productNameList"
                   :key="index"
@@ -55,7 +61,7 @@
               </div>
             </div>
             <span
-              v-show="!expandRows['product']"
+              v-show="isExpandProductTagShow && !expandRows['product']"
               class="row-expand un-select"
               @click="expandFieldRow('product')"
             >
@@ -63,7 +69,7 @@
               <i class="el-icon-arrow-down"></i>
             </span>
             <span
-              v-show="expandRows['product']"
+              v-show="isExpandProductTagShow && expandRows['product']"
               class="row-expand un-select"
               @click="expandFieldRow('product')"
             >
@@ -200,7 +206,7 @@
           :page.sync="listQuery.pageNum"
           :limit.sync="listQuery.pageSize"
           class="pagination"
-          @pagination="getTableList"
+          @pagination="togglePagination"
         />
       </div>
     </div>
@@ -245,14 +251,15 @@ export default {
       expandRows: {
         'industry': false,
         'product': false
-      }
+      },
+      isExpandIndustryTagShow: false,
+      isExpandProductTagShow: false
     }
   },
   watch: {
     'listQuery.fProName': {
       deep: true,
       handler(newValue, oldValue) {
-        console.log('watch中：', newValue)
         if (!newValue) {
           this.selectedFields = this.selectedFields.filter(item => item.label === '行业方案')
           return
@@ -278,23 +285,53 @@ export default {
       }
     }
   },
+  mounted() {
+    const { pageNum = 1, pageSize = 10, fProName = '', supName = '', fProMark = '', fIndustryId = '' } = this.$route.query
+    this.listQuery = Object.assign(this.listQuery, { pageNum, pageSize, fProName, supName, fProMark, fIndustryId })
+    setTimeout(() => {
+      this.isExpandIndustryTagShow = this.$refs.wrapIndustry.clientWidth > 1000
+      this.isExpandProductTagShow = this.$refs.wrapProduct.clientWidth > 1000
+    }, 1000)
+    if (fIndustryId) {
+      setTimeout(() => {
+        // 这个逻辑得改
+        console.log(this.industryList)
+        const targetItem = this.industryList.find(item => item.fId === fIndustryId)
+        this.selectedFields.push({ label: '行业方案', value: targetItem.fName })
+      }, 1000)
+    }
+    if (fProName) {
+      this.selectedFields.push({ label: '品名', value: fProName })
+    }
+  },
   methods: {
     async getProductName() {
       const { data } = await apiProductName({ type: 2 })
       this.productNameList = data.other
-      console.log(data)
     },
     async getIndustryList() {
       const { data } = await apiIndustrySolutionList()
       this.industryList = data.other
-      console.log(data)
     },
     genClass(item) {
       const index = this.selectedFields.findIndex(element => element.value === item.fName)
       return index === -1 ? '' : 'active'
     },
+    async  getTableList() {
+      const query = this.generateNoNullableObject(this.listQuery)
+      this.$router.push({
+        path: '',
+        query
+      })
+      try {
+        const { data } = await apiModifedMaterialList(this.listQuery)
+        this.tableList = data.other.list
+        this.total = data.other.total
+      } catch (error) {
+        console.error(error)
+      }
+    },
     chooseFieldItem(item, label) {
-      console.log(this.selectedFields)
       const index = this.selectedFields.findIndex(item => item['label'] === label)
       if (index === -1) {
         this.selectedFields.push({ label: label, value: item.fName })
@@ -307,7 +344,7 @@ export default {
       } else {
         this.selectedFields.splice(index, 1, { label: label, value: item.fName })
       }
-      console.log(this.listQuery)
+      this.getTableList()
     },
     closeFieldItem(index, label) {
       this.selectedFields.splice(index, 1)
@@ -317,6 +354,7 @@ export default {
       if (label === '行业方案') {
         this.$set(this.listQuery, 'fIndustryId', '')
       }
+      this.getTableList()
     },
     clearSelectedFields() {
       this.selectedFields = []
@@ -331,22 +369,13 @@ export default {
         fIndustryId: ''
       })
     },
-    async  handleSearch() {
-      this.listQuery.pageNum = 1
-      this.getTableList()
-    },
-    async  getTableList() {
-      try {
-        const { data } = await apiModifedMaterialList(this.listQuery)
-        this.tableList = data.other.list
-        this.total = data.other.total
-      } catch (error) {
-        console.error(error)
-      }
-    },
     expandFieldRow(label) {
       console.log(label)
       this.$set(this.expandRows, label, !this.expandRows[label])
+    },
+    async  handleSearch() {
+      this.listQuery.pageNum = 1
+      this.getTableList()
     },
     handleSetOrder(item) {
       console.log(item)
@@ -358,7 +387,9 @@ export default {
       })
     },
     handleCollect(item) {
-
+    },
+    togglePagination() {
+      this.getTableList()
     }
   }
 }
@@ -403,7 +434,7 @@ export default {
         }
         .filter-value-wrap {
           display: inline-block;
-          width: 1000px;
+          max-width: 1000px;
           height: 40px;
           overflow: hidden;
           text-overflow: ellipsis;
