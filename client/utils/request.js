@@ -10,6 +10,19 @@ const service = axios.create({
   timeout: 5000, // request timeout
   paramsSerializer(params) {
     return Qs.stringify(params, { arrayFormat: 'repeat' })
+  },
+  transformRequest: [
+    function (data) {
+      let ret = ''
+      for (const it in data) {
+        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+      }
+      ret = ret.substring(0, ret.lastIndexOf('&'))
+      return ret
+    }
+  ],
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
   }
 })
 

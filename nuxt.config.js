@@ -63,6 +63,7 @@ module.exports = {
   plugins: [
     { src: '~/plugins/element-ui.js', ssr: true },
     { src: '~/plugins/vue-extend.js' }
+    // { src: '~/plugins/router.js' }
   ],
   /*
    ** Nuxt.js dev-modules

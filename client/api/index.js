@@ -27,6 +27,52 @@ export const apiMarketNewsList = (params) => {
   })
 }
 
+/** ************************* 改性料交易  ***************************/
+
+export const apiProductName = (data) => {
+  return request({
+    url: '/orderBaseData/proNameList',
+    method: 'post',
+    data
+  })
+}
+
+export const apiIndustrySolutionList = (data) => {
+  return request({
+    url: '/orderBaseData/findIndustryList',
+    method: 'post',
+    data
+  })
+}
+
+export const apiModifedMaterialList = (data) => {
+  return request({
+    url: '/orderBaseData/modifiedList',
+    method: 'post',
+    data
+  })
+}
+
+// 改性料详情
+export const apiModifedMaterialDetail = (data) => {
+  return request({
+    url: '/orderBaseData/productionInfo',
+    method: 'post',
+    data
+  })
+}
+
+// 改性料详情
+export const apiModifedMaterialCollect = (data) => {
+  return request({
+    url: '/orderBaseData/collectAction',
+    method: 'post',
+    data
+  })
+}
+
+/** ************************* 改性料交易 end  ***********************/
+
 /** ************************* 帮助中心  ***************************/
 
 export const apiHelpList = (params) => {

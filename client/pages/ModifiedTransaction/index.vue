@@ -5,86 +5,300 @@
       <div class="filter-wrap">
         <div class="section-title">改性料交易</div>
         <div class="filter-field-wrap">
-          <div class="filter-fileld-row">
-            <span class="filter-label">行业方案</span>
-            <span class="filter-value">汽车</span>
-            <span class="filter-value">家电</span>
-            <span class="filter-value">生活用品</span>
-            <span class="filter-value">照明</span>
-            <span class="filter-value">电动工具</span>
-            <span class="filter-value">卫浴</span>
-            <span class="filter-value">滚塑制品</span>
-            <span class="filter-value">交通建筑</span>
-            <span class="row-expand">展开</span>
+          <div class="filter-field-item">
+            <div
+              class="filter-field-row clearfix"
+              :class="{'expanded':expandRows['industry']}"
+            >
+              <span class="filter-label fl">行业方案</span>
+              <div class="filter-value-wrap fl">
+                <span
+                  v-for="(item,index) in industryList"
+                  :key="index"
+                  class="filter-value un-select"
+                  @click="chooseFieldItem(item,'行业方案')"
+                >{{ item.fName }}</span>
+              </div>
+            </div>
+            <span
+              v-show="!expandRows['industry']"
+              class="row-expand un-select"
+              @click="expandFieldRow('industry')"
+            >
+              展开
+              <i class="el-icon-arrow-down"></i>
+            </span>
+            <span
+              v-show="expandRows['industry']"
+              class="row-expand un-select"
+              @click="expandFieldRow('industry')"
+            >
+              收起
+              <i class="el-icon-arrow-up"></i>
+            </span>
           </div>
-          <div class="filter-fileld-row">
-            <span class="filter-label">品名</span>
-            <span class="filter-value">PE</span>
-            <span class="filter-value">PP</span>
-            <span class="filter-value">ABS</span>
-            <span class="filter-value">HIPS</span>
-            <span class="filter-value">PC</span>
-            <span class="filter-value">PA</span>
-            <span class="filter-value">PET</span>
-            <span class="filter-value">POM</span>
-            <span class="filter-value">合金</span>
-            <span class="filter-value">PPO</span>
-            <span class="filter-value">PPS</span>
-            <span class="filter-value">弹性体</span>
-            <span class="row-expand">展开</span>
+          <div class="filter-field-item">
+            <div
+              class="filter-field-row clearfix"
+              :class="{'expanded':expandRows['product']}"
+            >
+              <span class="filter-label fl">品名</span>
+              <div class="filter-value-wrap fl">
+                <span
+                  v-for="(item,index) in productNameList"
+                  :key="index"
+                  class="filter-value un-select"
+                  @click="chooseFieldItem(item,'品名')"
+                >{{ item.fName }}</span>
+              </div>
+            </div>
+            <span
+              v-show="!expandRows['product']"
+              class="row-expand un-select"
+              @click="expandFieldRow('product')"
+            >
+              展开
+              <i class="el-icon-arrow-down"></i>
+            </span>
+            <span
+              v-show="expandRows['product']"
+              class="row-expand un-select"
+              @click="expandFieldRow('product')"
+            >
+              收起
+              <i class="el-icon-arrow-up"></i>
+            </span>
           </div>
         </div>
+        <div
+          v-show="selectedFields.length"
+          class="selected-fields-wrap"
+        >
+          <span class="selected-label">筛选条件</span>
+          <span
+            v-for="(item,index) in selectedFields"
+            :key="item.value"
+            class="selected-field un-select"
+          >{{ item.label }} : {{ item.value }}
+            <i
+              class="el-icon-close"
+              style="cursor:pointer;"
+              @click="closeFieldItem(index)"
+            ></i>
+          </span>
+          <span
+            class="clear-tag un-select"
+            @click="selectedFields=[]"
+          >清空筛选</span>
+        </div>
+        <el-form
+          ref="form"
+          :model="listQuery"
+          label-width="80px"
+          class="clearfix"
+        >
+          <el-form-item label="品名">
+            <el-input
+              v-model="listQuery.fProName"
+              placeholder="请输入品名"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="厂商">
+            <el-input
+              v-model="listQuery.supName"
+              placeholder="请输入厂商"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="牌号">
+            <el-input
+              v-model="listQuery.fProMark"
+              placeholder="请输入牌号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item class="btn-wrap">
+            <el-button
+              type="primary"
+              @click="handleSearch"
+            >搜索</el-button>
+            <el-button>重置</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-      <div class="select-fields-wrap">
-        <span>筛选条件</span>
-        <span class="selected-field">生活用品</span>
+      <div class="table-wrap">
+        <el-table
+          :data="tableList"
+          class="table-list"
+        >
+          <el-table-column
+            align="center"
+            prop="fName"
+            label="改性料"
+          />
+          <el-table-column
+            align="center"
+            prop="fManufacturer"
+            label="厂家"
+          />
+          <el-table-column
+            align="center"
+            prop="fMark"
+            label="牌号"
+          />
+          <el-table-column
+            align="center"
+            prop="fUse"
+            label="用途"
+          />
+          <el-table-column
+            align="center"
+            prop="fProTypeName"
+            label="行业方案"
+          />
+          <el-table-column
+            align="center"
+            prop="fOfferPrice"
+            label="价格"
+            sortable
+          />
+          <el-table-column
+            width="200"
+            align="center"
+            label="操作"
+          >
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                size="mini"
+                icon="el-icon-shopping-cart-2"
+                @click="handleSetOrder(scope.row)"
+              >下单</el-button>
+              <el-button
+                size="mini"
+                icon="el-icon-star-off"
+                @click="handleCollect(scope.row)"
+              >收藏</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <Pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="listQuery.pageNum"
+          :limit.sync="listQuery.pageSize"
+          class="pagination"
+          @pagination="getTableList"
+        />
       </div>
-      <el-form
-        ref="form"
-        :model="listQuery"
-        label-width="80px"
-        class="clearfix"
-      >
-        <el-form-item label="品名">
-          <el-input
-            v-model="listQuery.fProName"
-            placeholder="请输入品名"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="厂商">
-          <el-input
-            v-model="listQuery.supName"
-            placeholder="请输入厂商"
-          ></el-input>
-        </el-form-item>
-        <el-form-item label="牌号">
-          <el-input
-            v-model="listQuery.fProMark"
-            placeholder="请输入牌号"
-          ></el-input>
-        </el-form-item>
-        <el-form-item class="btn-wrap">
-          <el-button type="primary">搜索</el-button>
-          <el-button>重置</el-button>
-        </el-form-item>
-      </el-form>
-      <!-- <div class="table-wrap"></div> -->
     </div>
   </div>
 </template>
 <script>
 import LocationBar from '@/components/LocationBar'
+import Pagination from '@/components/Pagination'
+import { apiProductName, apiIndustrySolutionList, apiModifedMaterialList } from '@/api'
 export default {
   name: 'ModifiedTransaction',
-  components: { LocationBar },
+  components: { LocationBar, Pagination },
+  async  asyncData({ query, req }) {
+    try {
+      const { data } = await apiModifedMaterialList(query)
+      const tableList = data.other.list
+      const total = data.other.total
+      return {
+        tableList,
+        total
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  },
   data () {
     return {
       locationList: [{ name: '改性料交易', path: '' }],
+      productNameList: [],
+      industryList: [],
+      selectedFields: [],
+      total: 0,
       listQuery: {
+        pageNum: 1,
+        pageSize: 10,
         fProName: '', // 品名
         supName: '', // 厂商
         fProMark: '' // 牌号
+      },
+      tableList: [],
+      expandRows: {
+        'industry': false,
+        'product': false
       }
+    }
+  },
+  created() {
+    if (process.browser) {
+      if (!this.productNameList.length) {
+        this.getProductName()
+      }
+      if (!this.getIndustryList.length) {
+        this.getIndustryList()
+      }
+      if (!this.tableList.length) {
+        this.getTableList()
+      }
+    }
+  },
+  methods: {
+    async getProductName() {
+      const { data } = await apiProductName({ type: 2 })
+      this.productNameList = data.other
+      console.log(data)
+    },
+    async getIndustryList() {
+      const { data } = await apiIndustrySolutionList()
+      this.industryList = data.other
+      console.log(data)
+    },
+    chooseFieldItem(item, label) {
+      const index = this.selectedFields.findIndex(item => item['label'] === label)
+      if (index === -1) {
+        this.selectedFields.push({ label: label, value: item.fName })
+      } else {
+        this.selectedFields.splice(index, 1, { label: label, value: item.fName })
+      }
+      if (label === '品名') {
+        this.$set(this.listQuery, 'fProName', item.fName)
+      }
+    },
+    closeFieldItem(index) {
+      this.selectedFields.splice(index, 1)
+    },
+    async  handleSearch() {
+      this.listQuery.pageNum = 1
+      this.getTableList()
+    },
+    async  getTableList() {
+      try {
+        const { data } = await apiModifedMaterialList(this.listQuery)
+        this.tableList = data.other.list
+        this.total = data.other.total
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    expandFieldRow(label) {
+      console.log(label)
+      this.$set(this.expandRows, label, !this.expandRows[label])
+    },
+    handleSetOrder(item) {
+      console.log(item)
+      this.$router.push({
+        path: '/ModifiedTransaction/productDetail',
+        query: {
+          id: item.fId
+        }
+      })
+    },
+    handleCollect(item) {
+
     }
   }
 }
@@ -105,40 +319,101 @@ export default {
   }
   .filter-field-wrap {
     padding: 20px 0;
-    .filter-fileld-row {
+    border-top: 1px solid #efefef;
+    border-bottom: 1px solid #efefef;
+    .filter-field-item {
       position: relative;
-      height: 40px;
-      line-height: 40px;
-      .filter-label {
-        display: inline-block;
-        text-align: right;
-        min-width: 70px;
-        font-size: 14px;
-        font-weight: 700;
-        color: #333;
-        margin-right: 25px;
-      }
-      .filter-value {
-        font-size: 14px;
-        color: #333;
-        margin-right: 25px;
-        cursor: pointer;
+      .filter-field-row {
+        width: 1100px;
+        line-height: 40px;
+        &.expanded {
+          .filter-value-wrap {
+            height: auto;
+            white-space: normal;
+          }
+        }
+        .filter-label {
+          display: inline-block;
+          text-align: right;
+          min-width: 70px;
+          font-size: 14px;
+          font-weight: 700;
+          color: #333;
+          margin-right: 25px;
+        }
+        .filter-value-wrap {
+          display: inline-block;
+          width: 1000px;
+          height: 40px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          .filter-value {
+            font-size: 14px;
+            color: #333;
+            margin-right: 25px;
+            cursor: pointer;
+          }
+        }
       }
       .row-expand {
         position: absolute;
-        top: 0;
+        top: 10px;
         right: 0;
+        font-size: 12px;
+        display: inline-block;
+        color: #1588fc;
+        width: 60px;
+        height: 20px;
+        line-height: 20px;
+        border-radius: 2px;
+        text-align: center;
+        background-color: #e5f4ff;
+        cursor: pointer;
       }
+    }
+  }
+  .selected-fields-wrap {
+    padding-top: 20px;
+    font-size: 12px;
+    color: #333;
+    margin-right: 15px;
+    .selected-label {
+      display: inline-block;
+      width: 70px;
+      margin-right: 12px;
+      text-align: right;
+    }
+    .selected-field {
+      display: inline-block;
+      height: 24px;
+      line-height: 24px;
+      padding: 0 8px;
+      margin-right: 10px;
+      border-radius: 2px;
+      border: 1px solid #34a0fa;
+      font-size: 12px;
+      color: #333;
+    }
+    .clear-tag {
+      cursor: pointer;
     }
   }
 }
 ::v-deep.el-form {
+  padding-top: 20px;
   .el-form-item {
     float: left;
-    width: 300px;
+    width: 280px;
+    &.btn-wrap {
+      width: 300px;
+    }
     .el-button {
       width: 100px;
     }
   }
+}
+.pagination {
+  text-align: right;
 }
 </style>
