@@ -16,6 +16,7 @@
                   v-for="(item,index) in industryList"
                   :key="index"
                   class="filter-value un-select"
+                  :class="genClass(item)"
                   @click="chooseFieldItem(item,'行业方案')"
                 >{{ item.fName }}</span>
               </div>
@@ -48,6 +49,7 @@
                   v-for="(item,index) in productNameList"
                   :key="index"
                   class="filter-value un-select"
+                  :class="genClass(item)"
                   @click="chooseFieldItem(item,'品名')"
                 >{{ item.fName }}</span>
               </div>
@@ -83,12 +85,12 @@
             <i
               class="el-icon-close"
               style="cursor:pointer;"
-              @click="closeFieldItem(index)"
+              @click="closeFieldItem(index,item.label)"
             ></i>
           </span>
           <span
             class="clear-tag un-select"
-            @click="selectedFields=[]"
+            @click="clearSelectedFields"
           >清空筛选</span>
         </div>
         <el-form
@@ -99,20 +101,23 @@
         >
           <el-form-item label="品名">
             <el-input
-              v-model="listQuery.fProName"
+              v-model.trim="listQuery.fProName"
               placeholder="请输入品名"
+              clearable
             ></el-input>
           </el-form-item>
           <el-form-item label="厂商">
             <el-input
-              v-model="listQuery.supName"
+              v-model.trim="listQuery.supName"
               placeholder="请输入厂商"
+              clearable
             ></el-input>
           </el-form-item>
           <el-form-item label="牌号">
             <el-input
-              v-model="listQuery.fProMark"
+              v-model.trim="listQuery.fProMark"
               placeholder="请输入牌号"
+              clearable
             ></el-input>
           </el-form-item>
           <el-form-item class="btn-wrap">
@@ -173,10 +178,19 @@
                 @click="handleSetOrder(scope.row)"
               >下单</el-button>
               <el-button
+                v-if="scope.row.fIsCollect"
                 size="mini"
                 icon="el-icon-star-off"
                 @click="handleCollect(scope.row)"
-              >收藏</el-button>
+              >
+                <i class="el-icon-star-of"></i>
+              </el-button>
+              <el-button
+                size="mini"
+                icon="el-icon-star-off"
+                @click="handleCollect(scope.row)"
+              ><i class="el-icon-star-of"></i>
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -224,12 +238,30 @@ export default {
         pageSize: 10,
         fProName: '', // 品名
         supName: '', // 厂商
-        fProMark: '' // 牌号
+        fProMark: '', // 牌号
+        fIndustryId: ''// 行业方案
       },
       tableList: [],
       expandRows: {
         'industry': false,
         'product': false
+      }
+    }
+  },
+  watch: {
+    'listQuery.fProName': {
+      deep: true,
+      handler(newValue, oldValue) {
+        console.log('watch中：', newValue)
+        if (!newValue) {
+          this.selectedFields = this.selectedFields.filter(item => item.label === '行业方案')
+          return
+        }
+        this.selectedFields.forEach(item => {
+          if (item.label === '品名') {
+            this.$set(item, 'value', newValue)
+          }
+        })
       }
     }
   },
@@ -257,19 +289,47 @@ export default {
       this.industryList = data.other
       console.log(data)
     },
+    genClass(item) {
+      const index = this.selectedFields.findIndex(element => element.value === item.fName)
+      return index === -1 ? '' : 'active'
+    },
     chooseFieldItem(item, label) {
+      console.log(this.selectedFields)
       const index = this.selectedFields.findIndex(item => item['label'] === label)
       if (index === -1) {
         this.selectedFields.push({ label: label, value: item.fName })
+        if (label === '品名') {
+          this.$set(this.listQuery, 'fProName', item.fName)
+        }
+        if (label === '行业方案') {
+          this.$set(this.listQuery, 'fIndustryId', item.fId)
+        }
       } else {
         this.selectedFields.splice(index, 1, { label: label, value: item.fName })
       }
+      console.log(this.listQuery)
+    },
+    closeFieldItem(index, label) {
+      this.selectedFields.splice(index, 1)
       if (label === '品名') {
-        this.$set(this.listQuery, 'fProName', item.fName)
+        this.$set(this.listQuery, 'fProName', '')
+      }
+      if (label === '行业方案') {
+        this.$set(this.listQuery, 'fIndustryId', '')
       }
     },
-    closeFieldItem(index) {
-      this.selectedFields.splice(index, 1)
+    clearSelectedFields() {
+      this.selectedFields = []
+      this.listQuery.fIndustryId = ''
+    },
+    resetListQuery() {
+      this.selectedFields = []
+      this.listQuery = Object.assign(this.listQuery, {
+        fProName: '',
+        supName: '',
+        fProMark: '',
+        fIndustryId: ''
+      })
     },
     async  handleSearch() {
       this.listQuery.pageNum = 1
@@ -351,8 +411,11 @@ export default {
           .filter-value {
             font-size: 14px;
             color: #333;
-            margin-right: 25px;
+            padding: 0 12px;
             cursor: pointer;
+            &.active {
+              color: #ff7609;
+            }
           }
         }
       }
