@@ -131,7 +131,7 @@
               type="primary"
               @click="handleSearch"
             >搜索</el-button>
-            <el-button>重置</el-button>
+            <el-button @click="resetListQuery">重置</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -186,16 +186,19 @@
               <el-button
                 v-if="scope.row.fIsCollect"
                 size="mini"
-                icon="el-icon-star-off"
+                icon="el-icon-star-on"
+                class="btn-hasCollected"
                 @click="handleCollect(scope.row)"
               >
-                <i class="el-icon-star-of"></i>
+                已收藏
               </el-button>
               <el-button
+                v-else
                 size="mini"
                 icon="el-icon-star-off"
                 @click="handleCollect(scope.row)"
-              ><i class="el-icon-star-of"></i>
+              >
+                收藏
               </el-button>
             </template>
           </el-table-column>
@@ -274,44 +277,59 @@ export default {
   },
   created() {
     if (process.browser) {
+      const { pageNum = 1, pageSize = 10, fProName = '', supName = '', fProMark = '', fIndustryId = '' } = this.$route.query
+      this.listQuery = Object.assign(this.listQuery, { pageNum, pageSize, fProName, supName, fProMark, fIndustryId })
       if (!this.productNameList.length) {
         this.getProductName()
       }
-      if (!this.getIndustryList.length) {
+      if (!this.industryList.length) {
         this.getIndustryList()
       }
       if (!this.tableList.length) {
         this.getTableList()
       }
+      if (fIndustryId) {
+        if (this.industryList.length) {
+          const targetItem = this.industryList.find(item => item.fId === fIndustryId)
+          this.selectedFields.push({ label: '行业方案', value: targetItem.fName })
+        } else {
+          this.getIndustryList().then(() => {
+            const targetItem = this.industryList.find(item => item.fId === fIndustryId)
+            this.selectedFields.push({ label: '行业方案', value: targetItem.fName })
+          })
+        }
+      }
+      if (fProName) {
+        this.selectedFields.push({ label: '品名', value: fProName })
+      }
     }
   },
   mounted() {
-    const { pageNum = 1, pageSize = 10, fProName = '', supName = '', fProMark = '', fIndustryId = '' } = this.$route.query
-    this.listQuery = Object.assign(this.listQuery, { pageNum, pageSize, fProName, supName, fProMark, fIndustryId })
     setTimeout(() => {
       this.isExpandIndustryTagShow = this.$refs.wrapIndustry.clientWidth > 1000
       this.isExpandProductTagShow = this.$refs.wrapProduct.clientWidth > 1000
     }, 1000)
-    if (fIndustryId) {
-      setTimeout(() => {
-        // 这个逻辑得改
-        console.log(this.industryList)
-        const targetItem = this.industryList.find(item => item.fId === fIndustryId)
-        this.selectedFields.push({ label: '行业方案', value: targetItem.fName })
-      }, 1000)
-    }
-    if (fProName) {
-      this.selectedFields.push({ label: '品名', value: fProName })
-    }
   },
   methods: {
     async getProductName() {
-      const { data } = await apiProductName({ type: 2 })
-      this.productNameList = data.other
+      try {
+        const { data } = await apiProductName({ type: 2 })
+        this.productNameList = data.other
+        return data.other
+      } catch (error) {
+        console.error(error)
+        return Promise.reject(error)
+      }
     },
     async getIndustryList() {
-      const { data } = await apiIndustrySolutionList()
-      this.industryList = data.other
+      try {
+        const { data } = await apiIndustrySolutionList()
+        this.industryList = data.other
+        return data.other
+      } catch (error) {
+        console.error(error)
+        return Promise.reject(error)
+      }
     },
     genClass(item) {
       const index = this.selectedFields.findIndex(element => element.value === item.fName)
@@ -331,19 +349,22 @@ export default {
         console.error(error)
       }
     },
+    setListQueryByClickField(item, label) {
+      if (label === '品名') {
+        this.$set(this.listQuery, 'fProName', item.fName)
+      }
+      if (label === '行业方案') {
+        this.$set(this.listQuery, 'fIndustryId', item.fId)
+      }
+    },
     chooseFieldItem(item, label) {
       const index = this.selectedFields.findIndex(item => item['label'] === label)
       if (index === -1) {
         this.selectedFields.push({ label: label, value: item.fName })
-        if (label === '品名') {
-          this.$set(this.listQuery, 'fProName', item.fName)
-        }
-        if (label === '行业方案') {
-          this.$set(this.listQuery, 'fIndustryId', item.fId)
-        }
       } else {
         this.selectedFields.splice(index, 1, { label: label, value: item.fName })
       }
+      this.setListQueryByClickField(item, label)
       this.getTableList()
     },
     closeFieldItem(index, label) {
@@ -359,18 +380,28 @@ export default {
     clearSelectedFields() {
       this.selectedFields = []
       this.listQuery.fIndustryId = ''
+      this.listQuery.fProName = ''
+      this.$router.push({
+        path: '',
+        query: this.generateNoNullableObject(this.listQuery)
+      })
+      this.getTableList()
     },
     resetListQuery() {
       this.selectedFields = []
       this.listQuery = Object.assign(this.listQuery, {
-        fProName: '',
-        supName: '',
-        fProMark: '',
-        fIndustryId: ''
+        fProName: '', // 品名
+        supName: '', // 厂商
+        fProMark: '', // 牌号
+        fIndustryId: ''// 行业方案
       })
+      this.$router.push({
+        path: '',
+        query: this.generateNoNullableObject(this.listQuery)
+      })
+      this.getTableList()
     },
     expandFieldRow(label) {
-      console.log(label)
       this.$set(this.expandRows, label, !this.expandRows[label])
     },
     async  handleSearch() {
@@ -387,6 +418,7 @@ export default {
       })
     },
     handleCollect(item) {
+      this.$store.dispatch('openLoginDialogAction')
     },
     togglePagination() {
       this.getTableList()
@@ -505,6 +537,11 @@ export default {
     .el-button {
       width: 100px;
     }
+  }
+}
+::v-deep.el-table {
+  .btn-hasCollected {
+    color: #fb7e12;
   }
 }
 .pagination {

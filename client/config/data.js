@@ -25,12 +25,12 @@ export const headerList = [
 export const navList = [
   {
     name: '首页',
-    path: '/HomeIndex',
+    path: '',
     url: domain + '/HomeIndex'
   },
   {
     name: '原材料交易',
-    path: '/MaterialTransaction',
+    path: '',
     url: domain + '/MaterialTransaction'
   },
   {
@@ -40,12 +40,12 @@ export const navList = [
   },
   {
     name: '企业库',
-    path: '/CompanyService',
+    path: '',
     url: domain + '/CompanyService'
   },
   {
     name: '我的企业',
-    path: '/PersonalCenter',
+    path: '',
     url: domain + '/PersonalCenter'
   }
 ]

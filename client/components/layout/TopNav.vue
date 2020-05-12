@@ -7,13 +7,23 @@
         alt=""
       >
       <div class="nav-right-wrap fr">
-        <a
+        <span
           v-for="(item,index) in navList"
           :key="index"
-          :href="item.url"
-          :class="{'active':index === currentIndex}"
-          class="nav-right-item"
-        >{{ item.name }}</a>
+        >
+          <nuxt-link
+            v-if="item.path"
+            :to="item.path"
+            :class="{'active':index === currentIndex}"
+            class="nav-right-item"
+          >{{ item.name }}</nuxt-link>
+          <a
+            v-else
+            :href="item.url"
+            :class="{'active':index === currentIndex}"
+            class="nav-right-item"
+          >{{ item.name }}</a>
+        </span>
       </div>
     </div>
   </div>
