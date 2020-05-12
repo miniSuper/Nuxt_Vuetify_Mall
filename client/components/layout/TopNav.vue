@@ -5,6 +5,7 @@
         class="nav-logo"
         src="/images/logo_nav.png"
         alt=""
+        @click="$commonFunc.toHomePage(false)"
       >
       <div class="nav-right-wrap fr">
         <span

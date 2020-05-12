@@ -1,54 +1,46 @@
 <template>
   <div>
-    <el-dialog
-      title="欢迎来到【最有料】"
-      :visible.sync="isLoginShow"
-      :close-on-click-modal="true"
-      :before-close="beforeCloseDialog"
-      width="500px"
-    >
-      <el-form
-        :model="form"
-        label-position="right"
+    <no-ssr>
+      <el-dialog
+        title="欢迎来到【最有料】"
+        :visible.sync="isLoginShow"
+        :close-on-click-modal="true"
+        :before-close="beforeCloseDialog"
+        width="500px"
       >
-        <el-form-item>
-          <el-input
-            v-model="form.phone"
-            placeholder="手机号"
-          ></el-input>
-        </el-form-item>
-        <el-form-item class="row-qrcode">
-          <el-input
-            v-model="form.qrcode"
-            placeholder="验证码"
-            autocomplete="off"
-          ></el-input>
-          <el-button
-            type="primary"
-            class="btn-qrcode"
-            plain
-          >验证码</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            class="btn-login"
-            @click="closeLoginDialogAction"
-          >登录</el-button>
-        </el-form-item>
+        <el-form
+          :model="form"
+          label-position="right"
+        >
+          <el-form-item>
+            <el-input
+              v-model="form.phone"
+              placeholder="手机号"
+            ></el-input>
+          </el-form-item>
+          <el-form-item class="row-qrcode">
+            <el-input
+              v-model="form.qrcode"
+              placeholder="验证码"
+              autocomplete="off"
+            ></el-input>
+            <el-button
+              type="primary"
+              class="btn-qrcode"
+              plain
+            >验证码</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button
+              type="primary"
+              class="btn-login"
+              @click="closeLoginDialogAction"
+            >登录</el-button>
+          </el-form-item>
 
-      </el-form>
-      <!-- <div
-        slot="footer"
-        class="dialog-footer"
-      >
-        <el-button @click="isLoginShow = false">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="isLoginShow = false"
-        >确 定</el-button>
-      </div> -->
-    </el-dialog>
+        </el-form>
+      </el-dialog>
+    </no-ssr>
   </div>
 </template>
 

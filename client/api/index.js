@@ -93,7 +93,7 @@ export const apiFaqList = (params) => {
 
 export const apiFaqDetail = (params) => {
   return request({
-    url: '/article/getFaqByType',
+    url: '/article/getFaqById',
     method: 'get',
     params
   })

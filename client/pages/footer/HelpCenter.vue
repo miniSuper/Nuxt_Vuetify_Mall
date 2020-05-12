@@ -106,13 +106,13 @@ export default {
       this.getFaqList()
     },
     toArticleDetail(item) {
-      console.log(item.fId)
-      this.$router.push({
+      const routeUrl = this.$router.resolve({
         path: '/article/ArticleDetail',
         query: {
           id: item.fId
         }
       })
+      window.open(routeUrl.href, '_blank')
     },
     async getHelpList() {
       const { data } = await apiHelpList()

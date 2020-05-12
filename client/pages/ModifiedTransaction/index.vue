@@ -16,10 +16,10 @@
                 class="filter-value-wrap fl"
               >
                 <span
-                  v-for="(item,index) in industryList"
-                  :key="index"
+                  v-for="item in industryList"
+                  :key="item.fId"
                   class="filter-value un-select"
-                  :class="genClass(item)"
+                  :class="genClass(item,'行业方案')"
                   @click="chooseFieldItem(item,'行业方案')"
                 >{{ item.fName }}</span>
               </div>
@@ -52,10 +52,10 @@
                 class="filter-value-wrap fl"
               >
                 <span
-                  v-for="(item,index) in productNameList"
-                  :key="index"
+                  v-for="item in productNameList"
+                  :key="item.fName"
                   class="filter-value un-select"
-                  :class="genClass(item)"
+                  :class="genClass(item,'品名')"
                   @click="chooseFieldItem(item,'品名')"
                 >{{ item.fName }}</span>
               </div>
@@ -78,27 +78,29 @@
             </span>
           </div>
         </div>
-        <div
-          v-show="selectedFields.length"
-          class="selected-fields-wrap"
-        >
-          <span class="selected-label">筛选条件</span>
-          <span
-            v-for="(item,index) in selectedFields"
-            :key="item.value"
-            class="selected-field un-select"
-          >{{ item.label }} : {{ item.value }}
-            <i
-              class="el-icon-close"
-              style="cursor:pointer;"
-              @click="closeFieldItem(index,item.label)"
-            ></i>
-          </span>
-          <span
-            class="clear-tag un-select"
-            @click="clearSelectedFields"
-          >清空筛选</span>
-        </div>
+        <no-ssr>
+          <div
+            v-show="selectedFields.length"
+            class="selected-fields-wrap"
+          >
+            <span class="selected-label">筛选条件</span>
+            <span
+              v-for="(item,index) in selectedFields"
+              :key="item.label+item.value"
+              class="selected-field un-select"
+            >{{ item.label }} : {{ item.value }}
+              <i
+                class="el-icon-close"
+                style="cursor:pointer;"
+                @click="closeFieldItem(index,item.label)"
+              ></i>
+            </span>
+            <span
+              class="clear-tag un-select"
+              @click="clearSelectedFields"
+            >清空筛选</span>
+          </div>
+        </no-ssr>
         <el-form
           ref="form"
           :model="listQuery"
@@ -278,36 +280,27 @@ export default {
   created() {
     if (process.browser) {
       const { pageNum = 1, pageSize = 10, fProName = '', supName = '', fProMark = '', fIndustryId = '' } = this.$route.query
-      this.listQuery = Object.assign(this.listQuery, { pageNum, pageSize, fProName, supName, fProMark, fIndustryId })
-      if (!this.productNameList.length) {
-        this.getProductName()
-      }
-      if (!this.industryList.length) {
-        this.getIndustryList()
-      }
-      if (!this.tableList.length) {
-        this.getTableList()
-      }
-      if (fIndustryId) {
-        if (this.industryList.length) {
+      this.listQuery = Object.assign(this.listQuery, { pageNum: Number(pageNum), pageSize: Number(pageSize), fProName, supName, fProMark, fIndustryId })
+      this.getProductName().then(() => {
+        if (fProName) {
+          this.selectedFields.push({ label: '品名', value: fProName })
+        }
+      })
+      this.getIndustryList().then(() => {
+        if (fIndustryId) {
           const targetItem = this.industryList.find(item => item.fId === fIndustryId)
           this.selectedFields.push({ label: '行业方案', value: targetItem.fName })
-        } else {
-          this.getIndustryList().then(() => {
-            const targetItem = this.industryList.find(item => item.fId === fIndustryId)
-            this.selectedFields.push({ label: '行业方案', value: targetItem.fName })
-          })
         }
-      }
-      if (fProName) {
-        this.selectedFields.push({ label: '品名', value: fProName })
+      })
+      if (!this.tableList.length) {
+        this.getTableList()
       }
     }
   },
   mounted() {
     setTimeout(() => {
-      this.isExpandIndustryTagShow = this.$refs.wrapIndustry.clientWidth > 1000
-      this.isExpandProductTagShow = this.$refs.wrapProduct.clientWidth > 1000
+      this.isExpandIndustryTagShow = this.$refs.wrapIndustry.clientWidth >= 1000
+      this.isExpandProductTagShow = this.$refs.wrapProduct.clientWidth >= 1000
     }, 1000)
   },
   methods: {
@@ -331,8 +324,8 @@ export default {
         return Promise.reject(error)
       }
     },
-    genClass(item) {
-      const index = this.selectedFields.findIndex(element => element.value === item.fName)
+    genClass(item, label) {
+      const index = this.selectedFields.findIndex(element => element.label === label && element.value === item.fName)
       return index === -1 ? '' : 'active'
     },
     async  getTableList() {
