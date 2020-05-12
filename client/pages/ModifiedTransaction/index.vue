@@ -26,7 +26,7 @@
             </div>
             <span
               v-show="isExpandIndustryTagShow && !expandRows['industry']"
-              class="row-expand un-select"
+              class="btn-expand un-select"
               @click="expandFieldRow('industry')"
             >
               展开
@@ -34,7 +34,7 @@
             </span>
             <span
               v-show="isExpandIndustryTagShow &&expandRows['industry']"
-              class="row-expand un-select"
+              class="btn-expand un-select"
               @click="expandFieldRow('industry')"
             >
               收起
@@ -62,7 +62,7 @@
             </div>
             <span
               v-show="isExpandProductTagShow && !expandRows['product']"
-              class="row-expand un-select"
+              class="btn-expand un-select"
               @click="expandFieldRow('product')"
             >
               展开
@@ -70,7 +70,7 @@
             </span>
             <span
               v-show="isExpandProductTagShow && expandRows['product']"
-              class="row-expand un-select"
+              class="btn-expand un-select"
               @click="expandFieldRow('product')"
             >
               收起
@@ -475,7 +475,7 @@ export default {
           }
         }
       }
-      .row-expand {
+      .btn-expand {
         position: absolute;
         top: 10px;
         right: 0;

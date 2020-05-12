@@ -1,50 +1,125 @@
 <template>
   <div class="page-wrap">
+    <LocationBar :location-list="locationList" />
     <div class="pc-center">
-      <div class="product-chain-wrap">
-        <span class="label-name un-select">产业链</span>
-        <span
-          v-for="item in proChainList"
-          :key="item.fId"
-          class="pro-item un-select"
-          @click="selectProField(item,'产业链')"
-        >{{ item.fName }}</span>
-      </div>
-      <div class="product-type-wrap">
-        <span class="label-name un-select">品类</span>
-        <span
-          v-for="item in proTypeList"
-          :key="item.fId"
-          class="pro-item un-select"
-          @click="selectProField(item,'品类')"
-        >{{ item.fName }}</span>
-      </div>
-      <div class="product-name-wrap">
-        <span class="label-name un-select">品名</span>
-        <span
-          v-for="item in proNameList"
-          :key="item.categoryDictCode"
-          class="pro-item un-select"
-          @click="selectProField(item,'品名')"
-        >{{ item.category }}</span>
+      <FilterTab
+        :info="info"
+        @search="handleSearch"
+      />
+      <div class="table-wrap">
+        <el-table
+          :data="tableList"
+          class="table-list"
+        >
+          <el-table-column
+            align="center"
+            prop="fName"
+            label="改性料"
+          />
+          <el-table-column
+            align="center"
+            prop="fManufacturer"
+            label="厂家"
+          />
+          <el-table-column
+            align="center"
+            prop="fMark"
+            label="牌号"
+          />
+          <el-table-column
+            align="center"
+            prop="fUse"
+            label="用途"
+          />
+          <el-table-column
+            align="center"
+            prop="fProTypeName"
+            label="行业方案"
+          />
+          <el-table-column
+            align="center"
+            prop="fOfferPrice"
+            label="价格"
+            sortable
+          />
+          <el-table-column
+            width="200"
+            align="center"
+            label="操作"
+          >
+            <template slot-scope="scope">
+              <el-button
+                type="primary"
+                size="mini"
+                icon="el-icon-shopping-cart-2"
+                @click="handleSetOrder(scope.row)"
+              >下单</el-button>
+              <el-button
+                v-if="scope.row.fIsCollect"
+                size="mini"
+                icon="el-icon-star-on"
+                class="btn-hasCollected"
+                @click="handleCollect(scope.row)"
+              >
+                已收藏
+              </el-button>
+              <el-button
+                v-else
+                size="mini"
+                icon="el-icon-star-off"
+                @click="handleCollect(scope.row)"
+              >
+                收藏
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <Pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="listQuery.pageNum"
+          :limit.sync="listQuery.pageSize"
+          class="pagination"
+          @pagination="togglePagination"
+        />
       </div>
     </div>
+    <Pagination
+      v-show="total>0"
+      :total="total"
+      :page.sync="listQuery.pageNum"
+      :limit.sync="listQuery.pageSize"
+      class="pagination"
+      @pagination="togglePagination"
+    />
   </div>
 </template>
 
 <script>
+import LocationBar from '@/components/LocationBar'
+import Pagination from '@/components/Pagination'
+import FilterTab from '@/components/other/FilterTab'
+
 import { apiMarketFilterList } from '@/api'
 
 export default {
-  name: '',
-  components: {},
+  name: 'SupplyDemand',
+  components: { LocationBar, Pagination, FilterTab },
   data() {
     return {
-      proChainList: [],
-      proTypeList: [],
-      proNameList: [],
-      selectedFields: [],
-      listQuery: {}
+      locationList: [{ name: '市场供求', path: '' }],
+      total: 0,
+      listQuery: {
+        PageNum: 10,
+        ProvinceId: '',
+        Describe: '',
+        firstMatId: '',
+        secondMatId: '',
+        Category: ''
+      },
+      tableList: [],
+      currentTabIndex: 0,
+      info: {}
     }
   },
   computed: {},
@@ -54,51 +129,32 @@ export default {
   methods: {
     async getFilterList() {
       const { data } = await apiMarketFilterList()
-      // console.log(data)
       const info = data.other
-      this.proChainList = [{ fName: '不限', fId: 0 }].concat(info.firstMaterials)
-      this.proTypeList = [{ fName: '不限', fId: 0 }].concat(info.secondMaterials)
-      this.proNameList = [{ category: '不限', categoryDictCode: 0 }].concat(info.thirdMaterials)
-      console.log('this.proChainList', this.proChainList)
-      console.log('this.proTypeList', this.proTypeList)
-      console.log('this.proNameList', this.proNameList)
+      this.info = info
     },
-    setSelectedFields(name, label) {
-      this.selectedFields.find(item => item.label)
+    getTableList() {},
+    togglePagination() {
+
     },
-    selectProField(item, label) {
-      if (label === '品名') {
-      }
+    translateQueryParams() {
+
+    },
+    async  handleSearch(params) {
+      this.translateQueryParams(params)
+      this.getTableList()
     }
   }
 }
 </script>
 <style lang='scss' scoped>
 .page-wrap {
-  .product-chain-wrap {
+}
+::v-deep.el-table {
+  .btn-hasCollected {
+    color: #fb7e12;
   }
-  .product-type-wrap {
-  }
-  .product-name-wrap {
-  }
-  .label-name {
-    display: inline-block;
-    width: 100px;
-    text-align: right;
-    font-size: 14px;
-    font-weight: 700;
-    color: #333;
-    margin-right: 25px;
-  }
-  .pro-item {
-    font-size: 14px;
-    color: #333;
-    margin-right: 25px;
-    cursor: pointer;
-    &:hover,
-    &.active {
-      color: #ff7609;
-    }
-  }
+}
+.pagination {
+  text-align: right;
 }
 </style>
