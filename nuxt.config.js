@@ -9,7 +9,7 @@ module.exports = {
   mode: 'universal',
   srcDir: 'client/',
   env: {
-    NODE_ENV: process.env.mode
+    NODE_ENV: process.env.mode // 部署的时候 这里mode变量的值 是pm2.config.js那里传入的  开发的时候  是package.js 的命令行传入的
   },
   HOST: ENV_CONFIG.HOST,
   PORT: ENV_CONFIG.PORT,
