@@ -100,3 +100,15 @@ export const apiFaqDetail = (params) => {
 }
 
 /** ************************* 帮助中心 end  ***********************/
+
+/** ************************* 市场供求  ***************************/
+
+export const apiMarketFilterList = (params) => {
+  return request({
+    url: '/supplyDemand/getOptionalCondition',
+    method: 'get',
+    params
+  })
+}
+
+/** ************************* 市场供求 end ************************/

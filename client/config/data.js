@@ -44,6 +44,11 @@ export const navList = [
     url: domain + '/CompanyService'
   },
   {
+    name: '市场供求',
+    path: '/SupplyDemand',
+    url: domain + '/SupplyDemand'
+  },
+  {
     name: '我的企业',
     path: '',
     url: domain + '/PersonalCenter'
