@@ -2,10 +2,31 @@
   <div class="page-wrap">
     <LocationBar :location-list="locationList" />
     <div class="pc-center">
-      <FilterTab
-        :info="info"
-        @search="handleSearch"
-      />
+      <el-tabs
+        v-model="tabName"
+        @tab-click="toggleTab"
+      >
+        <el-tab-pane
+          label="供应"
+          name="seller"
+        >
+          <FilterTab
+            :info="info"
+            @search="handleSearch"
+          />
+        </el-tab-pane>
+        <el-tab-pane
+          label="求购"
+          name="buyer"
+        >
+          <FilterTab
+            :info="info"
+            @search="handleSearch"
+          />
+        </el-tab-pane>
+
+      </el-tabs>
+
       <div class="table-wrap">
         <el-table
           :data="tableList"
@@ -77,8 +98,8 @@
         <Pagination
           v-show="total>0"
           :total="total"
-          :page.sync="listQuery.pageNum"
-          :limit.sync="listQuery.pageSize"
+          :page.sync="pageNum"
+          :limit.sync="pageSize"
           class="pagination"
           @pagination="togglePagination"
         />
@@ -87,8 +108,8 @@
     <Pagination
       v-show="total>0"
       :total="total"
-      :page.sync="listQuery.pageNum"
-      :limit.sync="listQuery.pageSize"
+      :page.sync="pageNum"
+      :limit.sync="pageSize"
       class="pagination"
       @pagination="togglePagination"
     />
@@ -100,7 +121,7 @@ import LocationBar from '@/components/LocationBar'
 import Pagination from '@/components/Pagination'
 import FilterTab from '@/components/other/FilterTab'
 
-import { apiMarketFilterList } from '@/api'
+import { apiMarketFilterList, apiMarketTraderList } from '@/api'
 
 export default {
   name: 'SupplyDemand',
@@ -109,17 +130,14 @@ export default {
     return {
       locationList: [{ name: '市场供求', path: '' }],
       total: 0,
-      listQuery: {
-        PageNum: 10,
-        ProvinceId: '',
-        Describe: '',
-        firstMatId: '',
-        secondMatId: '',
-        Category: ''
-      },
+      pageNum: 1,
+      pageSize: 10,
+      listQuery: {},
+      listQueryCache: {},
       tableList: [],
       currentTabIndex: 0,
-      info: {}
+      info: {},
+      tabName: 'seller'
     }
   },
   computed: {},
@@ -132,23 +150,56 @@ export default {
       const info = data.other
       this.info = info
     },
-    getTableList() {},
+    async getTableList() {
+      console.log('this.listQuery', this.listQuery)
+      try {
+        const { data } = await apiMarketTraderList(this.listQuery)
+        console.log(data)
+        this.tableList = data.other.supplys.rows
+      } catch (error) {
+        console.error(error)
+      }
+    },
     togglePagination() {
-
+      this.getTableList()
     },
-    translateQueryParams() {
-
+    toggleTab() {
+      console.log(this.tabName)
+      const query = this.listQueryCache[this.tabName] || {}
+      this.translateQueryParams(query)
+      this.getTableList()
     },
-    async  handleSearch(params) {
-      this.translateQueryParams(params)
+    translateQueryParams(query) {
+      console.log(this.tabName)
+      this.listQuery = {}
+      if (this.tabName === 'seller') {
+        this.listQuery.supplyPageNum = this.pageSize
+        this.listQuery.supplyNum = this.pageNum
+        this.listQuery.supplyProvinceId = query.provinceId
+        this.listQuery.supplyDescribe = query.topic
+        this.listQuery.supplyfirstMatId = query.proChainId
+        this.listQuery.supplysecondMatId = query.proTypeId
+        this.listQuery.sCategory = query.proName
+      } else {
+        this.listQuery.demandNum = this.pageSize
+        this.listQuery.demandPageNum = this.pageNum
+        this.listQuery.demandProvinceId = query.provinceId
+        this.listQuery.demandDescribe = query.topic
+        this.listQuery.demandfirstMatId = query.proChainId
+        this.listQuery.demandsecondMatId = query.proTypeId
+        this.listQuery.dCategory = query.proName
+      }
+    },
+    async  handleSearch(query) {
+      console.log('query', query)
+      this.listQueryCache[this.tabName] = query
+      this.translateQueryParams(query)
       this.getTableList()
     }
   }
 }
 </script>
 <style lang='scss' scoped>
-.page-wrap {
-}
 ::v-deep.el-table {
   .btn-hasCollected {
     color: #fb7e12;
