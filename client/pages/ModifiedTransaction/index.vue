@@ -138,6 +138,22 @@
         </el-form>
       </div>
       <div class="table-wrap">
+        <div class="seo-data-wrap">
+          <div class="seo-data-content">
+            <div
+              v-for="item in tableList"
+              :key="item.fId"
+              class="seo-data-item"
+            >
+              <h6 class="seo-data-item-attrbute">{{ item.fName }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.fManufacturer }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.fMark }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.fUse }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.fProTypeName }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.fOfferPrice }}</h6>
+            </div>
+          </div>
+        </div>
         <el-table
           :data="tableList"
           class="table-list"
@@ -227,8 +243,8 @@ export default {
   async  asyncData({ query, req }) {
     try {
       const { data } = await apiModifedMaterialList(query)
-      const tableList = data.other.list
-      const total = data.other.total
+      const tableList = data.other && data.other.list || []
+      const total = data.other && data.other.total || 0
       return {
         tableList,
         total

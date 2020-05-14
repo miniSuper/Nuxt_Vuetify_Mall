@@ -30,6 +30,24 @@
       </div>
 
       <div class="result-wrap">
+        <div class="seo-data-wrap">
+          <div class="seo-data-content">
+            <div
+              v-for="item in tableList"
+              :key="item.fId"
+              class="seo-data-item"
+            >
+              <h6 class="seo-data-item-attrbute">{{ item.companyInfo.fName }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.customer && item.customer.fRealName }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.customer && item.customer.fNickName }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.customer && item.customer.fPhone }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.customer && item.customer.fPositionText ||'' }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.params && item.params.typeStr || '' }}</h6>
+              <h6 class="seo-data-item-attrbute">{{ item.params && item.params.matStr || '' }}</h6>
+
+            </div>
+          </div>
+        </div>
         <div class="main-list">
           <div class="main-list-head">
             <span class="color-blue">市场供需</span>
@@ -141,6 +159,20 @@ import { apiMarketFilterList, apiMarketTraderList } from '@/api'
 export default {
   name: 'SupplyDemand',
   components: { LocationBar, Pagination, FilterTab },
+  async asyncData({ query, req }) {
+    try {
+      const { data } = await apiMarketTraderList({
+        supplyNum: 1,
+        supplyPageNum: 10,
+        reveal: 0 })
+      const tableList = data.other && data.other.supplys && data.other.supplys.rows || []
+      return {
+        tableList
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  },
   data() {
     return {
       locationList: [{ name: '市场供求', path: '' }],
