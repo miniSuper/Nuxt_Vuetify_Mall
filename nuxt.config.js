@@ -87,13 +87,13 @@ module.exports = {
     proxy: true
   },
   proxy: {
-    '/api': {
-      target: 'https://vip.zuiyouliao.com', // 目标接口域名
-      changeOrigin: true, // 表示是否跨域
-      pathRewrite: {
-        '^/api': '/' // 把 /api 替换成 /
-      }
-    }
+    // '/api': {
+    //   target: 'https://vip.zuiyouliao.com', // 目标接口域名
+    //   changeOrigin: true, // 表示是否跨域
+    //   pathRewrite: {
+    //     '^/api': '/' // 把 /api 替换成 /
+    //   }
+    // }
   },
   /*
    ** vuetify module configuration
