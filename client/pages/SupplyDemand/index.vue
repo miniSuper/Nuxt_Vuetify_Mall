@@ -40,24 +40,51 @@
               v-for="item in tableList"
               :key="item.fId"
               class="main-list-item clearfix"
-              @click="toDetail(item)"
             >
               <div
                 :style="{backgroundImage: 'url('+item.customer.fUseravatar+ ')'}"
                 class="avatar-wrap fl"
+                @click="toDetail(item)"
               >
               </div>
               <div class="info-wrap fl">
-                <div class="item-company-name">{{ item.companyInfo && item.companyInfo.fName }}</div>
+                <div
+                  class="item-company-name"
+                  @click="toDetail(item)"
+                >{{ item.companyInfo && item.companyInfo.fName }}</div>
                 <!--  fRealName   fNickName  fPhone  fPositionText 逻辑我也不知道 反正之前别人的代码是这么写的 -->
-                <p class="item-telephone">{{ item.customer.fRealName ||item.customer.fNickName || item.customer.fPhone || item.customer.fPositionText ||'' }}</p>
-                <div class="item-industry-attribute">
+                <p
+                  class="item-telephone"
+                  @click="toDetail(item)"
+                >{{ item.customer.fRealName ||item.customer.fNickName || item.customer.fPhone || item.customer.fPositionText ||'' }}</p>
+                <div
+                  class="item-industry-attribute"
+                  @click="toDetail(item)"
+                >
                   <span class="item-material">{{ item.params && item.params.typeStr || '' }}</span>
                   <span class="item-industry">{{ item.params && item.params.matStr || '' }}</span>
                 </div>
-                <div class="item-message">{{ item.fDescribe }}</div>
+                <div
+                  class="item-message"
+                  @click="toDetail(item)"
+                >{{ item.fDescribe }}</div>
+                <div
+                  v-if="item.params && item.params.attachments"
+                  class="thumbnail-list"
+                >
+                  <el-image
+                    v-for="element in item.params.attachments"
+                    :key="element.fId"
+                    :src="generateImgUrl(element.fFileName)"
+                    :preview-src-list="getThumbnailSrcList(item.params.attachments)"
+                    class="thumbnail-img"
+                  ></el-image>
+                </div>
               </div>
-              <div class="date-province">
+              <div
+                class="date-province"
+                @click="toDetail(item)"
+              >
                 <span class="item-date">{{ item.fLastUpdateTime }}</span>
                 <span class="item-province">
                   <span class="label-province">交货地</span>
@@ -160,6 +187,9 @@ export default {
         console.error(error)
       }
     },
+    getThumbnailSrcList(list) {
+      return list.map(item => this.generateImgUrl(item.fFileName))
+    },
     togglePagination() {
       console.log('this.pageNum', this.pageNum)
       console.log('this.pageNum', this.pageNum)
@@ -179,7 +209,7 @@ export default {
       this.getTableList()
     },
     toDetail(item) {
-      // 这个方法是之前的人写的  要跳转到自己的页面
+    //   // 这个方法是之前的人写的  要跳转到自己的页面
       const reveal = this.tabName === 'seller' ? 0 : 1
       const provinceId = this.listQuery.provinceId ? this.listQuery.provinceId : ''
       const q = {
@@ -278,7 +308,7 @@ export default {
             overflow: hidden;
           }
           .info-wrap {
-            width: 700px;
+            width: 900px;
             .item-company-name {
               font-size: 16px;
               font-weight: 700;
@@ -332,6 +362,13 @@ export default {
                 color: #999;
               }
               color: #ff7609;
+            }
+          }
+          .thumbnail-list {
+            .thumbnail-img {
+              width: 100px;
+              height: 100px;
+              margin-right: 20px;
             }
           }
         }

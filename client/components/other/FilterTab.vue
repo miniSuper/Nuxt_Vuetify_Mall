@@ -34,7 +34,7 @@
         <i class="el-icon-arrow-up"></i>
       </span>
     </div>
-    <div class="product-type-wrap clearfix">
+    <!-- <div class="product-type-wrap clearfix">
       <span class="label-name un-select">品类</span>
       <div
         :class="{'expanded': expandCacheList[1]}"
@@ -68,7 +68,7 @@
         收起
         <i class="el-icon-arrow-up"></i>
       </span>
-    </div>
+    </div> -->
     <div class="product-name-wrap clearfix">
       <span class="label-name un-select">品名</span>
       <div
@@ -230,11 +230,11 @@ export default {
       return this.proTypeList.filter(item => item.fParentId === this.currentProChain.fId || item.fId === 0)
     },
     proNameValidList() {
-      if (!this.currentProType || !this.currentProType.fId) {
+      if (!this.currentProChain || !this.currentProChain.fId) {
         return this.proNameList
       }
       return this.proNameList.filter(item => {
-        return item.fParentIds && item.fParentIds.includes(this.currentProType.fId) || item.fId === 0
+        return item.fTopLevelIds && item.fTopLevelIds.includes(this.currentProChain.fId) || item.fId === 0
       })
     }
   },
